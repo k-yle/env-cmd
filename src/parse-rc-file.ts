@@ -1,7 +1,7 @@
 import { stat, readFile } from 'fs'
 import { promisify } from 'util'
 import { extname } from 'path'
-import { resolveEnvFilePath, isPromise } from './utils'
+import { resolveEnvFilePath } from './utils'
 
 const statAsync = promisify(stat)
 const readFileAsync = promisify(readFile)
