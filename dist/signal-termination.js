@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.TermSignals = void 0;
 const SIGNALS_TO_HANDLE = [
     'SIGINT', 'SIGTERM', 'SIGHUP'
 ];
@@ -82,12 +83,13 @@ class TermSignals {
      */
     _terminateProcess(code, signal) {
         if (signal !== undefined) {
-            return process.kill(process.pid, signal);
+            process.kill(process.pid, signal);
         }
-        if (code !== undefined) {
-            return process.exit(code);
+        else if (code !== undefined) {
+            process.exit(code);
         }
-        throw new Error('Unable to terminate parent process successfully');
+        else
+            throw new Error('Unable to terminate parent process successfully');
     }
     /**
      * Exit event listener clean up helper

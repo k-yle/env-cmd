@@ -1,11 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getRCFileVars = void 0;
 const fs_1 = require("fs");
 const util_1 = require("util");
 const path_1 = require("path");
 const utils_1 = require("./utils");
+const jsoncLoader_1 = require("./jsoncLoader");
 const statAsync = util_1.promisify(fs_1.stat);
 const readFileAsync = util_1.promisify(fs_1.readFile);
+const parserMapping = {
+    '.jsonc': jsoncLoader_1.jsoncLoader,
+    '.json': JSON.parse
+};
 /**
  * Gets the env vars from the rc file and rc environments
  */
@@ -23,13 +29,15 @@ async function getRCFileVars({ environments, filePath }) {
     const ext = path_1.extname(absolutePath).toLowerCase();
     let parsedData;
     try {
-        if (ext === '.json' || ext === '.js' || ext === '.cjs') {
-            const possiblePromise = require(absolutePath); /* eslint-disable-line */
-            parsedData = utils_1.isPromise(possiblePromise) ? await possiblePromise : possiblePromise;
+        if (ext === '.js' || ext === '.cjs') {
+            parsedData = await Promise.resolve().then(() => require(absolutePath));
         }
         else {
             const file = await readFileAsync(absolutePath, { encoding: 'utf8' });
-            parsedData = JSON.parse(file);
+            if (ext in parserMapping)
+                parsedData = await parserMapping[ext](file);
+            else
+                parsedData = JSON.parse(file);
         }
     }
     catch (e) {

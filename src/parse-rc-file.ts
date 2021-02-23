@@ -2,11 +2,13 @@ import { stat, readFile } from 'fs'
 import { promisify } from 'util'
 import { extname } from 'path'
 import { resolveEnvFilePath } from './utils'
+import { jsoncLoader } from './jsoncLoader'
 
 const statAsync = promisify(stat)
 const readFileAsync = promisify(readFile)
 
 const parserMapping: {[ext: string]: (src: string) => object } = {
+  '.jsonc': jsoncLoader,
   '.json': JSON.parse
 }
 
